@@ -21,6 +21,7 @@ services:
       - bootstrap.memory_lock=true
     networks:
       - local_elk_network
+    restart: unless-stopped
 
   logstash:
     image: logstash:7.9.1
@@ -37,6 +38,7 @@ services:
       - local_elk_network
     depends_on:
       - elasticsearch
+    restart: unless-stopped
 
   kibana:
     image: kibana:7.9.1
@@ -50,6 +52,7 @@ services:
       - local_elk_network
     depends_on:
       - elasticsearch
+    restart: unless-stopped
 
 networks:
   local_elk_network:
