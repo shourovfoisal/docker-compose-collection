@@ -11,6 +11,7 @@ services:
     volumes:
       - local_elasticsearch_volume:/usr/share/elasticsearch/data/
       - ./elk-config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elk-backup:/usr/share/elasticsearch/snapshots
     environment:
       - discovery.type=single-node
       - http.host=0.0.0.0
@@ -39,6 +40,8 @@ services:
     depends_on:
       - elasticsearch
     restart: unless-stopped
+    profiles:
+      - logging
 
   kibana:
     image: kibana:${STACK_VERSION}

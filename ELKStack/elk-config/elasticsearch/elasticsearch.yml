@@ -1,2 +1,3 @@
 cluster.name: "elasticsearch"
 network.host: localhost
+path.repo: ["/usr/share/elasticsearch/snapshots"]
