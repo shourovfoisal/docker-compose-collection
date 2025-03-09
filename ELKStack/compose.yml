@@ -3,7 +3,7 @@
 version: '3'
 services:
   elasticsearch:
-    image: elasticsearch:7.17.9
+    image: elasticsearch:${STACK_VERSION}
     container_name: elasticsearch
     ports:
       - "9200:9200"
@@ -24,7 +24,7 @@ services:
     restart: unless-stopped
 
   logstash:
-    image: logstash:7.17.9
+    image: logstash:${STACK_VERSION}
     container_name: logstash
     ports:
       - "5044:5044"
@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
 
   kibana:
-    image: kibana:7.17.9
+    image: kibana:${STACK_VERSION}
     container_name: kibana
     ports:
       - "5601:5601"
