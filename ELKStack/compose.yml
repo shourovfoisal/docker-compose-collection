@@ -1,0 +1,65 @@
+# https://medium.com/@lopchannabeen138/deploying-elk-inside-docker-container-docker-compose-4a88682c7643
+
+version: '3'
+services:
+  elasticsearch:
+    image: elasticsearch:8.17.3
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - local_elasticsearch_volume:/usr/share/elasticsearch/data/
+      - ./elk-config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    environment:
+      - discovery.type=single-node
+      - http.host=0.0.0.0
+      - transport.host=0.0.0.0
+      - xpack.security.enabled=false
+      - xpack.monitoring.enabled=false
+      - cluster.name=elasticsearch
+      - bootstrap.memory_lock=true
+    networks:
+      - local_elk_network
+
+  logstash:
+    image: logstash:8.17.3
+    container_name: logstash
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    volumes:
+      - ./elk-config/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./elk-config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - local_logstash_volume:/usr/share/logstash/data
+
+    networks:
+      - local_elk_network
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: kibana:8.17.3
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    volumes:
+      - ./elk-config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - local_kibana_volume:/usr/share/kibana/data
+    networks:
+      - local_elk_network
+    depends_on:
+      - elasticsearch
+
+networks:
+  local_elk_network:
+    driver: bridge
+    name: local_elk_network
+
+volumes:
+  local_elasticsearch_volume:
+    name: local_elasticsearch_volume
+  local_logstash_volume:
+    name: local_logstash_volume
+  local_kibana_volume:
+    name: local_kibana_volume
