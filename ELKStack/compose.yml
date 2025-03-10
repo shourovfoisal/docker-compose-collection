@@ -41,7 +41,7 @@ services:
       - elasticsearch
     restart: unless-stopped
     profiles:
-      - logging
+      - data_transform
 
   kibana:
     image: kibana:${STACK_VERSION}
