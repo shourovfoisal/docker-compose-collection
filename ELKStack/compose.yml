@@ -20,6 +20,8 @@ services:
       - xpack.monitoring.enabled=false
       - cluster.name=elasticsearch
       - bootstrap.memory_lock=true
+      # - "ES_JAVA_OPTS=-Xms1g -Xmx1g"   # Set heap size to 1GB
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"   # Set heap size to 512MB
     networks:
       - local_elk_network
     restart: unless-stopped
