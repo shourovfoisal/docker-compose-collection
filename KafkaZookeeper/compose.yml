@@ -1,15 +1,22 @@
+
 services:
   zookeeper:
     image: zookeeper:3.6.2
+    container_name: zookeeper
     ports:
       - "2181:2181"
     volumes:
-      - ./zookeeper/data:/data
-      - ./zookeeper/logs:/datalog
+     - ./zookeeper/data:/data
+     - ./zookeeper/logs:/datalog
+      # - zookeeper_data:/data
+      # - zookeeper_logs:/datalog
     restart: always
+    networks:
+      - kafkanet
 
   kafka:
     image: wurstmeister/kafka:2.13-2.7.1
+    container_name: kafka
     depends_on:
       - zookeeper
     ports:
@@ -17,21 +24,55 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_LISTENERS: "PLAINTEXT://:9092"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092"
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     volumes:
-      - ./kafka/data:/var/lib/kafka/data
-      - ./kafka/logs:/var/lib/kafka/logs
+     - ./kafka/data:/var/lib/kafka/data
+     - ./kafka/logs:/var/lib/kafka/logs
+      # - kafka_data:/var/lib/kafka/data
+      # - kafka_logs:/var/lib/kafka/logs
     restart: always
+    networks:
+      - kafkanet
 
-  Kafka-Ui:
+#  Kafka-Ui:
+#    depends_on:
+#      - kafka
+##    image: docker.redpanda.com/redpandadata/console:latest
+#    image: redpandadata/console:v2.8.3
+#    container_name: kafka_ui
+#    ports:
+#      - "8081:8080"
+#    environment:
+#      KAFKA_BROKERS: "kafka:9092"
+#    restart: always
+#    networks:
+#      - kafkanet
+
+  kafka-ui:
+    container_name: kafka-ui
+    restart: always
+    image: provectuslabs/kafka-ui:v0.7.2
+    ports:
+      - 8081:8080
     depends_on:
       - kafka
-    image: docker.redpanda.com/redpandadata/console:latest
-    ports:
-     - "8080:8080"
     environment:
-     KAFKA_BROKERS: "kafka:9092"
-    restart: always
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      KAFKA_CLUSTERS_0_NAME: 'Local Kafka Cluster'
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    networks:
+      - kafkanet
+
+# volumes:
+#   zookeeper_data:
+#   zookeeper_logs:
+#   kafka_data:
+#   kafka_logs:
+
+networks:
+  kafkanet:
+    name: local_kafka_network
+
