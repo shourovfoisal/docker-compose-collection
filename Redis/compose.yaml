@@ -1,0 +1,23 @@
+# https://geshan.com.np/blog/2022/01/redis-docker/#redis-with-docker-compose
+# version: '3.8'
+services:
+  cache:
+    image: redis:6.2-alpine
+    container_name: local_redis_cache
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    # command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes: 
+      - cache:/data
+    networks:
+      - appnetwork
+volumes:
+  cache:
+    name: local_redis_volume
+    driver: local
+networks:
+  appnetwork:
+    name: myappnetwork
+    external: true
