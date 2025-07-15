@@ -1,5 +1,9 @@
+# Source
 # https://geshan.com.np/blog/2022/01/redis-docker/#redis-with-docker-compose
-# version: '3.8'
+
+# How to Build and Use a Custom RedisCacheManager in Spring Boot
+# https://medium.com/@abanoubwagih/how-to-build-and-use-a-custom-rediscachemanager-in-spring-boot-44e8e3c761ae
+
 services:
   cache:
     image: redis:6.2-alpine
