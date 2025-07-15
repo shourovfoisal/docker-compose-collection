@@ -36,7 +36,6 @@ services:
       - ./elk-config/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
       - ./elk-config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
       - local_logstash_volume:/usr/share/logstash/data
-
     networks:
       - local_elk_network
     depends_on:
