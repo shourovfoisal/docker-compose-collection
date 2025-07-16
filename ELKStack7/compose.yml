@@ -1,10 +1,8 @@
-# https://medium.com/@lopchannabeen138/deploying-elk-inside-docker-container-docker-compose-4a88682c7643
+version: '3.8'
 
-version: '3'
 services:
   elasticsearch:
     image: elasticsearch:${STACK_VERSION}
-    container_name: elasticsearch
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -13,22 +11,25 @@ services:
       - ./elk-config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - ./elk-backup:/usr/share/elasticsearch/snapshots
     environment:
-      - discovery.type=single-node
-      - http.host=0.0.0.0
-      - transport.host=0.0.0.0
-      - xpack.security.enabled=false
-      - xpack.monitoring.enabled=false
-      - cluster.name=elasticsearch
-      - bootstrap.memory_lock=true
-      # - "ES_JAVA_OPTS=-Xms1g -Xmx1g"   # Set heap size to 1GB
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"   # Set heap size to 512MB
+      discovery.type: single-node
+      http.host: 0.0.0.0
+      transport.host: 0.0.0.0
+      xpack.security.enabled: "false"
+      xpack.monitoring.enabled: "false"
+      cluster.name: elasticsearch
+      bootstrap.memory_lock: "true"
+      ES_JAVA_OPTS: ${HEAP_SIZE}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     networks:
       - local_elk_network
     restart: unless-stopped
 
   logstash:
     image: logstash:${STACK_VERSION}
-    container_name: logstash
     ports:
       - "5044:5044"
       - "9600:9600"
@@ -36,27 +37,36 @@ services:
       - ./elk-config/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
       - ./elk-config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
       - local_logstash_volume:/usr/share/logstash/data
-    networks:
-      - local_elk_network
     depends_on:
       - elasticsearch
+    networks:
+      - local_elk_network
     restart: unless-stopped
     profiles:
       - data_transform
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9600"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   kibana:
     image: kibana:${STACK_VERSION}
-    container_name: kibana
     ports:
       - "5601:5601"
     volumes:
       - ./elk-config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
       - local_kibana_volume:/usr/share/kibana/data
-    networks:
-      - local_elk_network
     depends_on:
       - elasticsearch
+    networks:
+      - local_elk_network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5601"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 networks:
   local_elk_network:
