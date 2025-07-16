@@ -37,6 +37,7 @@ services:
       - ./elk-config/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
       - ./elk-config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
       - local_logstash_volume:/usr/share/logstash/data
+      - /home/shourov/Desktop/logs/:/logs/
     depends_on:
       - elasticsearch
     networks:
