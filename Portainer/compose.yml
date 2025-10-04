@@ -1,0 +1,16 @@
+# Use sample username and password as (admin MySuperSecret12)
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    ports:
+      - "9000:9000"          # Web UI
+      - "9443:9443"          # Optional: HTTPS port
+    volumes:
+      - portainer_data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  portainer_data:
+    name: portainer_data
